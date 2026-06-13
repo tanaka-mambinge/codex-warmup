@@ -41,3 +41,17 @@ If the container is already running (e.g. via the default `CMD`), you can manual
 ```bash
 docker exec -it <container> /usr/local/bin/codex-warmup
 ```
+
+## Schedules
+
+This container does not schedule anything itself — set up a cron schedule (or your platform's scheduler) on the server to run `/usr/local/bin/codex-warmup` inside the container at the times you want.
+
+### Example schedule
+
+Your container is using UTC, so use these for Harare/Zimbabwe time:
+
+| Harare time | UTC cron      | Command                       |
+|-------------|---------------|--------------------------------|
+| 05:00       | `0 3 * * *`   | `/usr/local/bin/codex-warmup` |
+| 10:07       | `7 8 * * *`   | `/usr/local/bin/codex-warmup` |
+| 15:14       | `14 13 * * *` | `/usr/local/bin/codex-warmup` |
