@@ -44,6 +44,8 @@ notify() {
 
 echo "[codex-warmup] $(date -Is) starting"
 
+SUBJECT_TIME="$(TZ=Africa/Harare date '+%a %d %b, %H:%M')"
+
 mkdir -p "$HOME/.codex" /tmp/codex-work
 cd /tmp/codex-work
 
@@ -52,7 +54,7 @@ if [ -z "${CODEX_AUTH_JSON:-}" ]; then
 
   echo "[codex-warmup] ERROR: CODEX_AUTH_JSON env var is missing"
 
-  notify "Codex Warmup — failed ❌" "Codex warmup failed.
+  notify "Codex Warmup — FAILED — ${SUBJECT_TIME}" "Codex warmup failed.
 
 Time: ${NOW}
 Reason: CODEX_AUTH_JSON environment variable is missing.
@@ -86,7 +88,7 @@ HARARE_DATE="$(TZ=Africa/Harare date '+%a %d %b %Y')"
 UTC_TIME="$(TZ=UTC date '+%H:%M UTC')"
 
 if [ "$EXIT_CODE" -eq 0 ] && echo "$OUTPUT" | grep -qi "codex"; then
-  notify "Codex Warmup — all good ✅" "Your Codex warmup completed successfully.
+  notify "Codex Warmup — OK — ${SUBJECT_TIME}" "Your Codex warmup completed successfully.
 
 Session: active
 Model: gpt-5.4-mini
@@ -98,7 +100,7 @@ No action needed."
 
   echo "[codex-warmup] $(date -Is) done"
 else
-  notify "Codex Warmup — failed ❌" "Codex warmup failed.
+  notify "Codex Warmup — FAILED — ${SUBJECT_TIME}" "Codex warmup failed.
 
 Date: ${HARARE_DATE}
 Time: ${HARARE_TIME} Harare time
