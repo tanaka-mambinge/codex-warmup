@@ -33,3 +33,11 @@ docker run --rm -e CODEX_AUTH_JSON="$(jq -c . ~/.codex/auth.json)" codex-warmup 
 ```
 
 The default `CMD` keeps the container alive (`tail -f /dev/null`); invoke the `codex-warmup` script explicitly (as above) or on your own schedule.
+
+## Manual trigger
+
+If the container is already running (e.g. via the default `CMD`), you can manually trigger a warmup run by exec-ing into it:
+
+```bash
+docker exec -it <container> /usr/local/bin/codex-warmup
+```
