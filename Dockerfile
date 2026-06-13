@@ -1,7 +1,14 @@
 FROM node:22-bookworm-slim
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends bash ca-certificates git bubblewrap \
+  && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    git \
+    bubblewrap \
+    curl \
+    jq \
+    tzdata \
   && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g @openai/codex
