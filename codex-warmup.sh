@@ -74,8 +74,11 @@ else
   echo "[codex-warmup] using existing auth.json on disk (preserves refreshed tokens)"
 fi
 
+MODEL="${WARMUP_MODEL:-openai/gpt-5.4-mini}"
+PROMPT="${WARMUP_PROMPT:-hi}"
+
 set +e
-OUTPUT="$(opencode run -m openai/gpt-5.4-mini "hi" 2>&1)"
+OUTPUT="$(opencode run -m "$MODEL" "$PROMPT" 2>&1)"
 EXIT_CODE=$?
 set -e
 
@@ -89,7 +92,7 @@ if [ "$EXIT_CODE" -eq 0 ]; then
   notify "Codex Warmup — OK — ${SUBJECT_TIME}" "Your Codex warmup completed successfully.
 
 Session: active
-Model: gpt-5.4-mini
+Model: ${MODEL}
 Date: ${HARARE_DATE}
 Time: ${HARARE_TIME} Harare time
 UTC: ${UTC_TIME}
