@@ -46,38 +46,29 @@ echo "[codex-warmup] $(date -Is) starting"
 
 SUBJECT_TIME="$(TZ=Africa/Harare date '+%a %d %b, %H:%M')"
 
-mkdir -p "$HOME/.codex" /tmp/codex-work
+mkdir -p "$HOME/.local/share/opencode" /tmp/codex-work
 cd /tmp/codex-work
 
-if [ -z "${CODEX_AUTH_JSON:-}" ]; then
+if [ -z "${OPENCODE_AUTH_JSON:-}" ]; then
   NOW="$(TZ=Africa/Harare date '+%a %d %b %Y, %H:%M %Z')"
 
-  echo "[codex-warmup] ERROR: CODEX_AUTH_JSON env var is missing"
+  echo "[codex-warmup] ERROR: OPENCODE_AUTH_JSON env var is missing"
 
   notify "Codex Warmup — FAILED — ${SUBJECT_TIME}" "Codex warmup failed.
 
 Time: ${NOW}
-Reason: CODEX_AUTH_JSON environment variable is missing.
+Reason: OPENCODE_AUTH_JSON environment variable is missing.
 
 Action needed: check the Dokploy environment variables."
 
   exit 1
 fi
 
-printf '%s' "$CODEX_AUTH_JSON" > "$HOME/.codex/auth.json"
-chmod 600 "$HOME/.codex/auth.json"
-
-cat > "$HOME/.codex/config.toml" <<'CONFIG'
-model = "gpt-5.4-mini"
-model_reasoning_effort = "none"
-approval_policy = "never"
-sandbox_mode = "read-only"
-
-[mcp_servers]
-CONFIG
+jq -n --argjson openai "$OPENCODE_AUTH_JSON" '{openai: $openai}' > "$HOME/.local/share/opencode/auth.json"
+chmod 600 "$HOME/.local/share/opencode/auth.json"
 
 set +e
-OUTPUT="$(codex exec --skip-git-repo-check "hi" 2>&1)"
+OUTPUT="$(opencode run -m openai/gpt-5.4-mini "hi" 2>&1)"
 EXIT_CODE=$?
 set -e
 
@@ -87,7 +78,7 @@ HARARE_TIME="$(TZ=Africa/Harare date '+%H:%M')"
 HARARE_DATE="$(TZ=Africa/Harare date '+%a %d %b %Y')"
 UTC_TIME="$(TZ=UTC date '+%H:%M UTC')"
 
-if [ "$EXIT_CODE" -eq 0 ] && echo "$OUTPUT" | grep -qi "codex"; then
+if [ "$EXIT_CODE" -eq 0 ]; then
   notify "Codex Warmup — OK — ${SUBJECT_TIME}" "Your Codex warmup completed successfully.
 
 Session: active

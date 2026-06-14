@@ -39,21 +39,21 @@ codex-warmup/
 
 ## Required configuration
 
-### `CODEX_AUTH_JSON`
+### `OPENCODE_AUTH_JSON`
 
-The container needs your Codex auth JSON as an environment variable:
+The container needs your OpenAI OAuth credentials (as used by `opencode`) as an environment variable:
 
 ```env
-CODEX_AUTH_JSON=...
+OPENCODE_AUTH_JSON=...
 ```
 
-Generate it from your local Codex login:
+Generate it from your local `opencode` login (`opencode auth login` against OpenAI, if not already done):
 
 ```bash
-jq -c . ~/.codex/auth.json
+jq -c '.openai' ~/.local/share/opencode/auth.json
 ```
 
-Copy the output and set it as `CODEX_AUTH_JSON` in your deployment environment.
+Copy the output and set it as `OPENCODE_AUTH_JSON` in your deployment environment.
 
 Examples:
 
@@ -62,7 +62,7 @@ Examples:
 * CI/CD secret
 * Server scheduler secret
 
-> **Security warning:** `CODEX_AUTH_JSON` contains Codex authentication tokens. Treat it like a password. Never commit it to Git.
+> **Security warning:** `OPENCODE_AUTH_JSON` contains OpenAI authentication tokens. Treat it like a password. Never commit it to Git. The access token expires periodically; `opencode` refreshes it automatically using the refresh token, but if the refresh token itself is ever revoked you'll need to regenerate and re-paste this value.
 
 ---
 
@@ -93,7 +93,7 @@ If any notification variable is missing, the warmup still runs, but email notifi
 ## Example `.env.local`
 
 ```env
-CODEX_AUTH_JSON={"paste":"your-compact-auth-json-here"}
+OPENCODE_AUTH_JSON={"paste":"your-compact-auth-json-here"}
 
 RESEND_API_KEY=re_xxxxx
 NOTIFY_EMAIL=you@example.com
@@ -197,7 +197,7 @@ So it stays alive and waits for scheduled jobs.
 Add these under the application’s runtime **Environment Settings**:
 
 ```env
-CODEX_AUTH_JSON=...
+OPENCODE_AUTH_JSON=...
 RESEND_API_KEY=...
 NOTIFY_EMAIL=...
 FROM_NAME=Codex Warmup
@@ -238,18 +238,18 @@ If your scheduler does not support timezones and runs in UTC, use:
 
 ## Troubleshooting
 
-### `CODEX_AUTH_JSON env var is missing`
+### `OPENCODE_AUTH_JSON env var is missing`
 
 The variable is not available inside the running container.
 
 Fix:
 
-1. Add `CODEX_AUTH_JSON` to the application’s runtime environment.
+1. Add `OPENCODE_AUTH_JSON` to the application’s runtime environment.
 2. Redeploy the app.
 3. Check inside the container:
 
 ```bash
-echo "$CODEX_AUTH_JSON" | head -c 20
+echo "$OPENCODE_AUTH_JSON" | head -c 20
 ```
 
 Expected output starts with:
@@ -357,7 +357,7 @@ README.md
 ## Security notes
 
 * Do not commit `.env`, `.env.local`, or any auth JSON.
-* Do not print the full `CODEX_AUTH_JSON` in logs.
+* Do not print the full `OPENCODE_AUTH_JSON` in logs.
 * Keep the Dokploy app private; it does not need a public domain.
 * Rotate Codex auth if the token is leaked.
 * Treat Resend API keys as secrets.

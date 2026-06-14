@@ -11,7 +11,7 @@ RUN apt-get update \
     tzdata \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g @openai/codex
+RUN npm install -g opencode-ai
 
 WORKDIR /app
 
