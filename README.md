@@ -55,6 +55,8 @@ jq -c '.openai' ~/.local/share/opencode/auth.json
 
 Copy the output and set it as `OPENCODE_AUTH_JSON` in your deployment environment.
 
+> **Token refresh:** the OpenAI access token is valid for ~10 days and `opencode` refreshes it automatically on use. The warmup script only seeds `~/.local/share/opencode/auth.json` from `OPENCODE_AUTH_JSON` if that file doesn't already exist — so as long as the container keeps running and the schedule fires at least once within that window, the on-disk credentials stay refreshed indefinitely. If the container is redeployed/recreated (filesystem wiped), it re-seeds from `OPENCODE_AUTH_JSON`, which may then be stale if it's been a while — regenerate it with the command above if warmup starts failing after a redeploy.
+
 Examples:
 
 * Dokploy application environment variable

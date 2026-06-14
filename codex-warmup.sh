@@ -49,23 +49,30 @@ SUBJECT_TIME="$(TZ=Africa/Harare date '+%a %d %b, %H:%M')"
 mkdir -p "$HOME/.local/share/opencode" /tmp/codex-work
 cd /tmp/codex-work
 
-if [ -z "${OPENCODE_AUTH_JSON:-}" ]; then
-  NOW="$(TZ=Africa/Harare date '+%a %d %b %Y, %H:%M %Z')"
+AUTH_FILE="$HOME/.local/share/opencode/auth.json"
 
-  echo "[codex-warmup] ERROR: OPENCODE_AUTH_JSON env var is missing"
+if [ ! -s "$AUTH_FILE" ]; then
+  if [ -z "${OPENCODE_AUTH_JSON:-}" ]; then
+    NOW="$(TZ=Africa/Harare date '+%a %d %b %Y, %H:%M %Z')"
 
-  notify "Codex Warmup — FAILED — ${SUBJECT_TIME}" "Codex warmup failed.
+    echo "[codex-warmup] ERROR: OPENCODE_AUTH_JSON env var is missing"
+
+    notify "Codex Warmup — FAILED — ${SUBJECT_TIME}" "Codex warmup failed.
 
 Time: ${NOW}
 Reason: OPENCODE_AUTH_JSON environment variable is missing.
 
 Action needed: check the Dokploy environment variables."
 
-  exit 1
-fi
+    exit 1
+  fi
 
-jq -n --argjson openai "$OPENCODE_AUTH_JSON" '{openai: $openai}' > "$HOME/.local/share/opencode/auth.json"
-chmod 600 "$HOME/.local/share/opencode/auth.json"
+  echo "[codex-warmup] seeding auth.json from OPENCODE_AUTH_JSON (first run)"
+  jq -n --argjson openai "$OPENCODE_AUTH_JSON" '{openai: $openai}' > "$AUTH_FILE"
+  chmod 600 "$AUTH_FILE"
+else
+  echo "[codex-warmup] using existing auth.json on disk (preserves refreshed tokens)"
+fi
 
 set +e
 OUTPUT="$(opencode run -m openai/gpt-5.4-mini "hi" 2>&1)"
